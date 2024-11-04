@@ -9,7 +9,7 @@ const port = process.env.PORT || 8080;
 
 
 app.use(cors({
-    origin: 'http://localhost:3000' , // Specify your frontend origin
+    origin: '*' , // Specify your frontend origin
     credentials: true // Allow cookies and other credentials to be sent
 }));
 
