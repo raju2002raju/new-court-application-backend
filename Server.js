@@ -9,14 +9,14 @@ const port = process.env.PORT || 8080;
 
 
 app.use(cors({
-  origin: '*' , 
-  credentials: true 
+    origin: 'http://localhost:3000' , // Specify your frontend origin
+    credentials: true // Allow cookies and other credentials to be sent
 }));
 
 
 app.use(express.json());
 
-mongoose.connect(process.env.MONGO_URI || 'mongodb+srv://royr55601:royr55601@cluster0.xra8inl.mongodb.net/legaldrafting', {
+mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 }).then(() => {
@@ -38,8 +38,14 @@ const exportFile = require('./Routes/exportFiles');
 const aiAudioChat = require('./Routes/aiAudioChat');
 const pdfExport = require('./Routes/pdfExtract');
 const otpVerification = require('./Routes/otpVerification')
+const audioChat = require('./Routes/aiAudioChat')
+const logoutRoutes = require('./Routes/logout');
+const chatbot = require('./Routes/chatbot')
+
+
 
 // API routes
+app.use('/api', logoutRoutes);
 app.use('/api', apiRoutes);
 app.use('/api', transcriptionRoutes);
 app.use('/api', promptRoutes); 
@@ -49,6 +55,8 @@ app.use('/api', exportFile);
 app.use('/api', aiAudioChat);
 app.use('/api', pdfExport);
 app.use('/api', otpVerification)
+app.use('/api', audioChat)
+app.use('/api', chatbot)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use((err, req, res, next) => {

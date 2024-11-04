@@ -4,9 +4,51 @@ const PDFDocument = require('pdfkit');
 const docx = require('docx');
 const { Document, Paragraph, TextRun, AlignmentType, Header, Footer, PageBreak, HeadingLevel, Spacing } = docx;
 
-// PDF Export Route remains the same...
+router.post('/export-pdf', async (req, res) => {
+    try {
+        const { content, title = 'Legal Document' } = req.body;
 
-// Updated DOCX Export Route
+        if (!content) {
+            return res.status(400).json({ error: 'Content is required' });
+        }
+
+        // Set response headers
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename=legal-document-${Date.now()}.pdf`);
+
+        // Create PDF document
+        const doc = new PDFDocument({
+            margins: {
+                top: 50,
+                bottom: 50,
+                left: 72,
+                right: 72
+            }
+        });
+
+        // Pipe the PDF directly to the response
+        doc.pipe(res);
+
+        // Add content to PDF
+        doc.fontSize(16).text(title, { align: 'center' });
+        doc.moveDown();
+        doc.fontSize(12).text(content, {
+            align: 'left',
+            lineGap: 5
+        });
+
+        // Finalize the PDF
+        doc.end();
+
+    } catch (error) {
+        console.error('PDF Generation Error:', error);
+        // Only send error response if headers haven't been sent
+        if (!res.headersSent) {
+            res.status(500).json({ error: 'Failed to generate PDF' });
+        }
+    }
+});
+
 router.post('/export/docx', async (req, res) => {
     try {
         const { content, title = 'Legal Document' } = req.body;
